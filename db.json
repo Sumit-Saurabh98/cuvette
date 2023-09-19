@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "jim",
+      "email": "jim@gmail.com",
+      "mobile": "8462595637",
+      "level": "easy",
+      "password": "jim@123"
+    },
+    {
+      "name": "36",
+      "mobile": "353246",
+      "email": "bg@gmail.com",
+      "password": "saddsfb",
+      "level": "hard",
+      "id": 2
+    },
+    {
+      "name": "a",
+      "mobile": "1234567890",
+      "email": "a@gmail.com",
+      "password": "a",
+      "level": "hard",
+      "id": 3
+    },
+    {
+      "name": "ram",
+      "mobile": "12345",
+      "email": "ram@gmail.com",
+      "password": "ram@123",
+      "level": "hard",
+      "id": 4
+    }
+  ]
+}
