@@ -18,6 +18,7 @@ import {
   Button,
   Icon,
   useToast,
+  Spinner
 } from "@chakra-ui/react";
 import { AuthContext } from "../context/AuthProvider";
 function Signin(props) {
@@ -196,7 +197,7 @@ function Signin(props) {
         <ReCAPTCHA sitekey="6LdecqQlAAAAAF5O-JC8ProsSC_nHykNvfTpWp2B" onChange={onChange} />
       </Center>
       <Center py={"20px"}>
-          <Button onClick={handleSubmit} px="20px" colorScheme="orange">  {loading ? "Submitting..." : "Register Now"}</Button>
+          <Button onClick={handleSubmit} px="20px" colorScheme="orange">  {loading ? <Spinner/> : "Register Now"}</Button>
       </Center>
     </Box>
   );
