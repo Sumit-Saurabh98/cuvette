@@ -1,0 +1,23 @@
+/* Green box style */
+.box.green {
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    cursor: pointer;
+}
+
+/* Red box style */
+.box.red {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    cursor: not-allowed;
+}
+
+.title{
+    margin-top: 20px;
+    font-size: 60px;
+    background: -webkit-linear-gradient(rgb(188, 12, 241), rgb(212, 4, 4));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+}

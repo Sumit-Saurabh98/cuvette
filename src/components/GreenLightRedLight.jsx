@@ -1,136 +1,249 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Box, Button, Container, Flex, useToast } from '@chakra-ui/react';
+import React, { useState, useEffect, useContext } from "react";
+import {
+  Box,
+  Button,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useToast,
+} from "@chakra-ui/react";
+import "../style/GreenLightRedLight.css";
+import { AuthContext } from "../context/AuthProvider";
+import axios from "axios";
 
-function GreenLightRedLight(props) {
-    const toast = useToast();
-    const [user, setUser] = useState(null);
-    const [isGreen, setIsGreen] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [clicked, setClicked] = useState(false);
-    const [intervalId, setIntervalId] = useState(null); // To store the interval ID
-    const [count, setCount] = useState(40); // Initial countdown time
-    const [score, setScore] = useState(0); // Initial score
-    const [gameEnded, setGameEnded] = useState(false); // Indicates if the game has ended
-    const [remainingTime, setRemainingTime] = useState(40); // Remaining time in seconds
+const GreenLightRedLight = () => {
+  const toast = useToast();
+  const { level, setName } = useContext(AuthContext);
+  const [started, setStarted] = useState(false);
+  const [won, setWon] = useState(false);
+  const [score, setScore] = useState(0);
+  const [singleUser, setSingleUser] = useState({});
+  const [isGreen, setGreen] = useState(false);
+  const [user, setUser] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(40);
+  const [target, setTarget] = useState(10);
 
-    const getUser = async (mno) => {
-        const { data } = await axios.get(`http://localhost:8080/users?mobile=${mno}`);
-        setUser(data[0]);
-    };
-
-    useEffect(() => {
-        const userMob = localStorage.getItem("GLRLUM");
-        if (userMob) {
-            getUser(userMob);
-        }
-    }, []);
-
-    const getRandomTime = () => {
-        return Math.floor(Math.random() * 1001) + 1000; // Random value between 1000 and 2000 milliseconds
-    };
-
-    const handlePlayClick = () => {
-        setClicked(true);
-        setIsPlaying(true);
-        setGameEnded(false);
-
-        // Start the color switching interval
-        const interval = setInterval(() => {
-            setIsGreen((prevIsGreen) => !prevIsGreen);
-        }, getRandomTime());
-
-        // Set a timeout to clear the interval after 40 seconds
-        setTimeout(() => {
-            clearInterval(interval);
-            setIsPlaying(false);
-            setClicked(false);
-            setGameEnded(true);
-
-            // Check the user's level and score to show the result
-            let message = "";
-            if (user && user.level === "easy" && score >= 10) {
-                message = "Winner! Your Score: " + score;
-            } else if (user && user.level === "medium" && score >= 15) {
-                message = "Winner! Your Score: " + score;
-            } else if (user && user.level === "hard" && score >= 25) {
-                message = "Winner! Your Score: " + score;
-            } else {
-                message = "Loser! Your Score: " + score;
-            }
-
-            // Show result in a toast
-            toast({
-                title: "Game Over",
-                description: message,
-                status: "info",
-                duration: 5000,
-                isClosable: true,
-            });
-
-            // Reset the countdown timer and remaining time
-            setRemainingTime(40);
-        }, 40000);
-
-        setIntervalId(interval); // Store the interval ID
-
-        // Countdown timer
-        let remainingTime = 40;
-        setCount(remainingTime);
-
-        const countdownInterval = setInterval(() => {
-            if (!gameEnded) {
-                remainingTime -= 1;
-                setCount(remainingTime);
-
-                if (remainingTime === 0) {
-                    clearInterval(countdownInterval);
-                    setGameEnded(true);
-                }
-            }
-        }, 1000); // Update every second
-    };
-
-    return (
-        <Box bg={"#011029"} w="100vw" h="100vh" color={"white"}>
-            <h1>Red Light Green Light</h1>
-            <Container>
-                <Flex justifyContent={"space-around"} flexWrap={"wrap"} alignItems={"center"}>
-                    <Box>
-                        <Box
-                            w="300px" h="100px" backgroundColor={isGreen? "green" : "red"}
-                            onClick={()=>{
-                                if (isGreen && !gameEnded) {
-                                    setScore((prevScore) => prevScore + 1);
-                                } else if (!gameEnded) {
-                                    // Show game over alert if the user clicked during red and the game has not ended
-                                    clearInterval(intervalId);
-                                    setIsPlaying(false);
-                                    setClicked(false);
-                                    setGameEnded(true);
-                                }
-                            }}
-                        >
-                        </Box>
-                        <Button my={"30px"} px="80px" fontSize={"30px"} isDisabled={clicked || gameEnded} onClick={handlePlayClick} disabled={isPlaying}>
-                            Play
-                        </Button>
-                        <Box>
-                            {gameEnded ? "Game Over!" : `Time left: ${remainingTime} seconds`}
-                        </Box>
-                        {gameEnded && (
-                            <Box>
-                                Total Score: {score}
-                            </Box>
-                        )}
-                    </Box>
-                    <Box>
-                        <h1>Leaderboard</h1>
-                    </Box>
-                </Flex>
-            </Container>
-        </Box>
+  const getUserData = async () => {
+    const { data } = await axios.get(
+      `${process.env.REACT_APP_API}/users?_sort=score&_order=desc`
     );
-}
+    setUser(data);
+  };
+
+  const getSingleUser = async (mob) => {
+    const { data } = await axios.get(
+      `${process.env.REACT_APP_API}/users?mobile=${mob}`
+    );
+    setSingleUser(data[0]);
+    setName(data[0].name);
+  };
+
+  const updateScore = async (mob) => {
+    const singleUserScore = singleUser.score;
+    if (score > singleUserScore) {
+      await axios.patch(`${process.env.REACT_APP_API}/users/${singleUser.id}`, {
+        score: score,
+      });
+    }
+  };
+
+  useEffect(() => {
+    updateScore();
+  }, [gameOver]);
+  console.log(level);
+  useEffect(() => {
+    getUserData();
+
+    if (level === "easy") {
+      setTarget(10);
+    } else if (level === "medium") {
+      setTarget(15);
+    } else {
+      setTarget(25);
+    }
+  }, [level]);
+
+  console.log("score:-", score);
+
+  useEffect(() => {
+    const mob = localStorage.getItem("GLRLUM");
+    if (mob) {
+      getSingleUser(mob);
+    }
+  }, []);
+
+  const getRandomColor = () => {
+    return Math.random() < 0.5;
+  };
+
+  const startGame = () => {
+    setStarted(true);
+    setGameOver(false);
+    setWon(false);
+    setScore(0);
+    setTimeLeft(40);
+    setGreen(getRandomColor());
+  };
+
+  const changeColor = () => {
+    const timeInterval = 1000;
+    const randomTime = Math.floor(Math.random() * timeInterval * 2) + 1;
+    setTimeout(() => {
+      setGreen(getRandomColor());
+    }, randomTime);
+  };
+
+  const endGame = () => {
+    if (score >= target) {
+      setWon(true);
+      popToast(true);
+    } else {
+      setGameOver(true);
+      popToast(false);
+    }
+
+    setStarted(false);
+  };
+
+  const popToast = (win) => {
+    toast({
+      title: win ? "Congratulations" : "Try Again",
+      status: win ? "success" : "error",
+      duration: 4000,
+      isClosable: true,
+      position: "bottom-right",
+    });
+  };
+
+  useEffect(() => {
+    if (started) {
+      const intervalId = setInterval(() => {
+        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+
+        if (timeLeft <= 0 || score >= target) {
+          clearInterval(intervalId);
+          endGame();
+        } else {
+          changeColor();
+        }
+      }, 1000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [started, timeLeft, score, target]);
+
+  const handleClick = (color) => {
+    if (color === "green" && started) {
+      setScore((prevScore) => prevScore + 1);
+      changeColor();
+    } else if (color === "red" && started) {
+      endGame();
+    }
+  };
+
+  const restartGame = () => {
+    setStarted(false);
+    setGameOver(false);
+    setWon(false);
+    setScore(0);
+    setGreen(false);
+  };
+
+  return (
+    <Box>
+      <Text className="title">Green Light Red Light Game</Text>
+      <Box display="flex" justifyContent="center" flexWrap="wrap" gap="30px">
+        <Box
+          boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px;"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          maxHeight="400px"
+          width="270px"
+          borderRadius="10px"
+        >
+          {!started && !gameOver && !won && (
+            <Button onClick={startGame}>Start Game</Button>
+          )}
+          {started && !gameOver && !won && (
+            <Box>
+              <Box
+                style={{ borderRadius: "5px", width: "100%" }}
+                className={`box ${isGreen ? "green" : "red"}`}
+                onClick={() => handleClick(isGreen ? "green" : "red")}
+              >
+                {isGreen ? "click" : "stop"}
+              </Box>
+              <Text my="10px">Time Left : {timeLeft} seconds</Text>
+              <Box>
+                <Text my="10px">Score : {score}</Text>
+                <Text>Target : {target}</Text>
+              </Box>
+            </Box>
+          )}
+          {gameOver && (
+            <Box>
+              <Text color={"red"}>Better Luck 😢😢 Next Time Game Over!</Text>
+              <Text>Your Score : {score}</Text>
+              <Button onClick={restartGame}>Play Again</Button>
+            </Box>
+          )}
+          {won && (
+            <Box>
+              <Text color="green">
+                Congratulation 🎉🎉 You are the Winner !!!
+              </Text>
+              <Button mt="20px" onClick={restartGame}>
+                Play Again
+              </Button>
+            </Box>
+          )}
+        </Box>
+        <Box
+          boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;"
+          borderRadius="10px"
+        >
+          <Text fontSize="3xl">Leaderboard</Text>
+          <Text>Total Players : {user.length}</Text>
+          <TableContainer maxHeight="300px" overflowY="scroll">
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Rank</Th>
+                  <Th>Name</Th>
+                  <Th isNumeric>Points</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {user &&
+                  user.map((u, idx) => {
+                    return (
+                      <Tr key={u.id}>
+                        <Td>
+                          {idx === 0 || idx === 1 || idx === 2 ? (
+                            <>🏆{idx + 1}</>
+                          ) : (
+                            <>{idx + 1}</>
+                          )}
+                        </Td>
+                        <Td>{u.name}</Td>
+                        <Td isNumeric>{u.score}</Td>
+                      </Tr>
+                    );
+                  })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
 export default GreenLightRedLight;

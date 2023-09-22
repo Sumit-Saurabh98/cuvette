@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { BsFillTelephonePlusFill } from "react-icons/bs";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -19,6 +19,7 @@ import {
   Icon,
   useToast,
 } from "@chakra-ui/react";
+import { AuthContext } from "../context/AuthProvider";
 function Signin(props) {
   const toast = useToast();
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ function Signin(props) {
   const [captcha, setcaptcha] = useState(false);
   const [mobile, setmobile] = useState("");
   const [password, setpassword] = useState("");
+
+  const {setAuth} = useContext(AuthContext)
   const handleClick = () => setShow(!show);
 
   const onChange = () => {
@@ -94,8 +97,10 @@ function Signin(props) {
               isClosable: true,
             });
             localStorage.setItem("GLRLUM", mobile)
+            setAuth(true)
               navigate("/dashboard");
           } else {
+            setAuth(false)
             toast({
               title: "Wrong Credentials",
               description: "Input Correct Credentials",
@@ -106,6 +111,7 @@ function Signin(props) {
           }
         })
         .catch((err) => {
+          setAuth(false)
           toast({
             title: "Signed-in Failed",
             description: "Failed :" + err.message,

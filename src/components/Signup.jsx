@@ -22,13 +22,14 @@ import { BsFillTelephonePlusFill } from "react-icons/bs";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { FaLevelUpAlt } from "react-icons/fa";
-import React from "react";
+import React, { useContext } from "react";
 import Signin from "./Signin";
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthProvider";
 
 function Signup(props) {
   const navigate = useNavigate();
@@ -49,6 +50,8 @@ function Signup(props) {
   const [email, setemail] = useState("");
   const [level, setLevel] = useState("");
   const [password, setPassword] = useState("");
+
+  const {setAuth} = useContext(AuthContext)
 
   const handleClick = () => setShow(!show);
 
@@ -117,7 +120,8 @@ function Signup(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let userDataObj = { name, mobile, email, password, level };
+    const score = 0;
+    let userDataObj = { name, mobile, email, password, level, score };
     if (isValidated()) {
       axios.get(`http://localhost:8080/users`).then((res) => {
         const user = res.data.find((data) => data.mobile === mobile);
@@ -133,16 +137,11 @@ function Signup(props) {
                 isClosable: true,
               });
               localStorage.setItem("GLRLUM", mobile)
+              setAuth(true)
               navigate("/dashboard")
-              setTimeout(() => {
-                setName("");
-                setmobile("");
-                setemail("");
-                setPassword("");
-                setLevel("");
-              }, 2000);
             })
             .catch((err) => {
+              setAuth(false)
               toast({
                 title: "Registration Failed",
                 description: "Failed :" + err.message,
@@ -152,6 +151,7 @@ function Signup(props) {
               });
             });
         } else {
+          setAuth(false)
           toast({
             title: "Registered number",
             description: "Enter the new mobile number",

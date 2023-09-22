@@ -1,36 +1,76 @@
 {
   "users": [
     {
-      "id": 1,
       "name": "jim",
+      "mobile": "1234567890",
       "email": "jim@gmail.com",
-      "mobile": "8462595637",
-      "level": "easy",
-      "password": "jim@123"
+      "password": "jim@123",
+      "level": "medium",
+      "score": 90,
+      "id": 1
     },
     {
-      "name": "36",
-      "mobile": "353246",
-      "email": "bg@gmail.com",
-      "password": "saddsfb",
-      "level": "hard",
+      "name": "bob",
+      "mobile": "236234562345",
+      "email": "bob@gmail.com",
+      "password": "bob@123",
+      "level": "easy",
+      "score": 20,
       "id": 2
     },
     {
-      "name": "a",
-      "mobile": "1234567890",
-      "email": "a@gmail.com",
-      "password": "a",
-      "level": "hard",
+      "name": "max",
+      "mobile": "73246234753",
+      "email": "max@gmail.com",
+      "password": "max@123",
+      "level": "medium",
+      "score": 30,
       "id": 3
     },
     {
-      "name": "ram",
-      "mobile": "12345",
-      "email": "ram@gmail.com",
-      "password": "ram@123",
+      "name": "nill",
+      "mobile": "87732576238",
+      "email": "nill@gmail.com",
+      "password": "nill@123",
       "level": "hard",
+      "score": 20,
       "id": 4
+    },
+    {
+      "name": "braid",
+      "mobile": "4564564564",
+      "email": "braid@gmail.com",
+      "password": "braid@123",
+      "level": "medium",
+      "score": 10,
+      "id": 5
+    },
+    {
+      "name": "kim",
+      "mobile": "45645734562",
+      "email": "kim@gmail.com",
+      "password": "kim@123",
+      "level": "hard",
+      "score": 35,
+      "id": 6
+    },
+    {
+      "name": "peter",
+      "mobile": "4564564564",
+      "email": "peter@gmail.com",
+      "password": "peter@123",
+      "level": "easy",
+      "score": 10,
+      "id": 7
+    },
+    {
+      "name": "ken",
+      "mobile": "25321345767",
+      "email": "ken@gmail.com",
+      "password": "ken@123",
+      "level": "easy",
+      "score": 0,
+      "id": 8
     }
   ]
 }
