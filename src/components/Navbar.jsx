@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate()
-const {setLevel, name, setAuth} = useContext(AuthContext)
+const {setLevel, name, setAuth, auth} = useContext(AuthContext)
   return (
     <Box h={"65px"} px={"30px"} display={"flex"} justifyContent={"space-between"} alignItems={"center"} backgroundColor={"yellow.400"}>
       <Box>
@@ -23,7 +23,7 @@ const {setLevel, name, setAuth} = useContext(AuthContext)
         setAuth(false)
          window.location.reload();
         navigate("/")
-      }} fontSize="20px" _hover={{cursor:"pointer"}}>Logout</Text>
+      }} fontSize="20px" _hover={{cursor:"pointer"}}>{auth ? "Logout":""}</Text>
       </Box>
     <Box display="flex" justifyContent="space-between" gap={"20px"}>
     <Select onChange={(e)=>setLevel(e.target.value)} placeholder='Level'>

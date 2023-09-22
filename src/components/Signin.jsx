@@ -23,6 +23,7 @@ import { AuthContext } from "../context/AuthProvider";
 function Signin(props) {
   const toast = useToast();
   const navigate = useNavigate();
+  const [loading, setLoading] =  useState(false)
   const [inputFocus, setInputFocus] = useState({
     field2: false,
     field4: false,
@@ -82,8 +83,9 @@ function Signin(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isValidated()) {
+      setLoading(true);
       axios
-        .get(`http://localhost:8080/users`)
+        .get(`${process.env.REACT_APP_API}/users`)
         .then((res) => {
           const filterredData = res.data.filter((data) => {
             return data.mobile === mobile && data.password === password;
@@ -96,6 +98,7 @@ function Signin(props) {
               duration: 2000,
               isClosable: true,
             });
+            setLoading(false)
             localStorage.setItem("GLRLUM", mobile)
             setAuth(true)
               navigate("/dashboard");
@@ -193,7 +196,7 @@ function Signin(props) {
         <ReCAPTCHA sitekey="6LdecqQlAAAAAF5O-JC8ProsSC_nHykNvfTpWp2B" onChange={onChange} />
       </Center>
       <Center py={"20px"}>
-          <Button onClick={handleSubmit} px="20px" colorScheme="orange">Login Now</Button>
+          <Button onClick={handleSubmit} px="20px" colorScheme="orange">  {loading ? "Submitting..." : "Register Now"}</Button>
       </Center>
     </Box>
   );

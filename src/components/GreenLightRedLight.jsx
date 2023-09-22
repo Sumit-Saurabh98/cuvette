@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Button,
+  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -25,23 +26,28 @@ const GreenLightRedLight = () => {
   const [singleUser, setSingleUser] = useState({});
   const [isGreen, setGreen] = useState(false);
   const [user, setUser] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(40);
   const [target, setTarget] = useState(10);
 
   const getUserData = async () => {
+    setLoading(true);
     const { data } = await axios.get(
       `${process.env.REACT_APP_API}/users?_sort=score&_order=desc`
     );
     setUser(data);
+    setLoading(false);
   };
 
   const getSingleUser = async (mob) => {
+    setLoading(true);
     const { data } = await axios.get(
       `${process.env.REACT_APP_API}/users?mobile=${mob}`
     );
     setSingleUser(data[0]);
     setName(data[0].name);
+    setLoading(false);
   };
 
   const updateScore = async (mob) => {
@@ -220,24 +226,34 @@ const GreenLightRedLight = () => {
                   <Th isNumeric>Points</Th>
                 </Tr>
               </Thead>
-              <Tbody>
-                {user &&
-                  user.map((u, idx) => {
-                    return (
-                      <Tr key={u.id}>
-                        <Td>
-                          {idx === 0 || idx === 1 || idx === 2 ? (
-                            <>🏆{idx + 1}</>
-                          ) : (
-                            <>{idx + 1}</>
-                          )}
-                        </Td>
-                        <Td>{u.name}</Td>
-                        <Td isNumeric>{u.score}</Td>
-                      </Tr>
-                    );
-                  })}
-              </Tbody>
+              {!loading ? (
+                <Tbody>
+                  {user &&
+                    user.map((u, idx) => {
+                      return (
+                        <Tr key={u.id}>
+                          <Td>
+                            {idx === 0 || idx === 1 || idx === 2 ? (
+                              <>🏆{idx + 1}</>
+                            ) : (
+                              <>{idx + 1}</>
+                            )}
+                          </Td>
+                          <Td>{u.name}</Td>
+                          <Td isNumeric>{u.score}</Td>
+                        </Tr>
+                      );
+                    })}
+                </Tbody>
+              ) : (
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="green.500"
+                  size="xl"
+                />
+              )}
             </Table>
           </TableContainer>
         </Box>

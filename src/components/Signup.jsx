@@ -50,6 +50,7 @@ function Signup(props) {
   const [email, setemail] = useState("");
   const [level, setLevel] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const {setAuth} = useContext(AuthContext)
 
@@ -123,12 +124,14 @@ function Signup(props) {
     const score = 0;
     let userDataObj = { name, mobile, email, password, level, score };
     if (isValidated()) {
-      axios.get(`http://localhost:8080/users`).then((res) => {
+      setLoading(true)
+      axios.get(`${process.env.REACT_APP_API}/users`).then((res) => {
         const user = res.data.find((data) => data.mobile === mobile);
         if (!user) {
           axios
-            .post(`http://localhost:8080/users`, userDataObj)
+            .post(`${process.env.REACT_APP_API}/users`, userDataObj)
             .then((res) => {
+              setLoading(false)
               toast({
                 title: "Registration successfully",
                 description: "Account created successfully",
@@ -168,28 +171,17 @@ function Signup(props) {
     <Box bg={"#011029"} h="100vh" w="100vw">
       <Center>
         <Box
-          backgroundSize="100% 100%"
-          backgroundPosition="center"
-          backgroundRepeat="no-repeat"
-          h="650px"
-          w="1000px"
-          mt="65px"
-          p="10px"
+          mt="35px"
           borderRadius={"7px"}
         >
           <Center>
-            <Box w="400px" h="400px"></Box>
             <Box
-              w="550px"
-              h="630px"
               bg="white"
               borderRadius={"7px"}
             >
               <Center>
                 <Box
                   borderRadius="0 0 100% 100%"
-                  w="250"
-                  h="65"
                   bg="#011129"
                   color="white"
                 >
@@ -197,8 +189,6 @@ function Signup(props) {
                     pt="10px"
                     as="h1"
                     borderRadius="0 0 100% 100%"
-                    w="250"
-                    h="65"
                     bg="#011129"
                     color="white"
                     fontFamily={"cursive"}
@@ -214,10 +204,10 @@ function Signup(props) {
               <Center>
                 <Tabs color={"gray.500"} colorScheme="orange">
                   <TabList>
-                    <Tab fontSize={"25px"} w="250px">
+                    <Tab fontSize={"25px"} >
                       Login
                     </Tab>
-                    <Tab fontSize={"25px"} w="250px">
+                    <Tab fontSize={"25px"}>
                       Registration
                     </Tab>
                   </TabList>
@@ -354,7 +344,7 @@ function Signup(props) {
                       </Center>
                       <Center py={"20px"}>
                         <Button  onClick={handleSubmit} colorScheme="orange">
-                          Register Now
+                          {loading ? "Submitting..." : "Register Now"}
                         </Button>
                       </Center>
                     </TabPanel>
