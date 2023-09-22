@@ -16,6 +16,7 @@ import {
   Icon,
   useToast,
   Select,
+  Spinner
 } from "@chakra-ui/react";
 import { FaUserAlt } from "react-icons/fa";
 import { BsFillTelephonePlusFill } from "react-icons/bs";
@@ -344,7 +345,7 @@ function Signup(props) {
                       </Center>
                       <Center py={"20px"}>
                         <Button  onClick={handleSubmit} colorScheme="orange">
-                          {loading ? "Submitting..." : "Register Now"}
+                          {loading ? <Spinner/> : "Register Now"}
                         </Button>
                       </Center>
                     </TabPanel>
